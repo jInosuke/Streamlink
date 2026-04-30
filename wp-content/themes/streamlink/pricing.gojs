@@ -1,0 +1,86 @@
+document.addEventListener('DOMContentLoaded', function() {
+    const billingToggle = document.getElementById('billingToggle');
+    
+    if (!billingToggle) return;
+
+    const toggleLabels = document.querySelectorAll('.toggle-label');
+    const pricingCards = document.querySelectorAll('.pricing-card');
+
+    // Set initial state
+    updatePricing(false);
+    toggleLabels[0].classList.add('active');
+
+    // Toggle event
+    billingToggle.addEventListener('change', function() {
+        const isAnnual = this.checked;
+        updatePricing(isAnnual);
+        
+        // Update active label
+        toggleLabels.forEach(label => {
+            const period = label.dataset.period;
+            if ((period === 'annual' && isAnnual) || (period === 'monthly' && !isAnnual)) {
+                label.classList.add('active');
+            } else {
+                label.classList.remove('active');
+            }
+        });
+    });
+
+    function updatePricing(isAnnual) {
+        pricingCards.forEach(card => {
+            const amountElement = card.querySelector('.amount');
+            const monthlyPrice = amountElement.dataset.monthly;
+            const annualPrice = amountElement.dataset.annual;
+            
+            if (isAnnual && annualPrice) {
+                amountElement.textContent = annualPrice;
+            } else {
+                amountElement.textContent = monthlyPrice;
+            }
+        });
+    }
+
+    // AJAX Add to Cart (optional - for better UX)
+    const addToCartButtons = document.querySelectorAll('.btn-pricing');
+    
+    addToCartButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const productId = this.dataset.productId;
+            const originalText = this.textContent;
+            
+            this.textContent = 'Adding...';
+            this.disabled = true;
+            
+            // WooCommerce AJAX add to cart
+            const formData = new FormData();
+            formData.append('action', 'woocommerce_ajax_add_to_cart');
+            formData.append('product_id', productId);
+            formData.append('quantity', 1);
+            
+            fetch(wc_add_to_cart_params.ajax_url, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert('Error adding to cart');
+                    this.textContent = originalText;
+                    this.disabled = false;
+                } else {
+                    this.textContent = '✓ Added!';
+                    setTimeout(() => {
+                        window.location.href = wc_add_to_cart_params.cart_url;
+                    }, 500);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                this.textContent = originalText;
+                this.disabled = false;
+            });
+        });
+    });
+});

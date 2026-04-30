@@ -1,0 +1,29 @@
+# Ignore WordPress core
+/wp-admin/
+/wp-includes/
+/wp-*.php
+/index.php
+/xmlrpc.php
+/readme.html
+/license.txt
+
+# Ignore uploads and generated content
+/wp-content/uploads/
+/wp-content/upgrade/
+/wp-content/cache/
+
+# Ignore default themes (keep only yours)
+/wp-content/themes/twentytwenty*/
+/wp-content/themes/index.php
+
+# Ignore default plugins (keep only custom)
+/wp-content/plugins/akismet/
+/wp-content/plugins/hello.php
+/wp-content/plugins/index.php
+
+# Ignore sensitive config
+wp-config.php
+
+# Ignore OS/editor junk
+.DS_Store
+Thumbs.db
